@@ -7,11 +7,6 @@ on:
         description: "R version (release/devel/oldrel-1)"
         required: false
         default: "release"
-      run_revdep_like:
-        description: "Run broader check settings"
-        required: false
-        type: boolean
-        default: false
   push:
     branches:
       - "**"
@@ -35,7 +30,7 @@ jobs:
           - { os: ubuntu-latest, r: devel }
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -52,10 +47,7 @@ jobs:
       - name: Check package
         uses: r-lib/actions/check-r-package@v2
         with:
-          args: >-
-            --as-cran
-            --no-manual
-            ${{ github.event.inputs.run_revdep_like == 'true' && '--run-donttest' || '' }}
+          args: --as-cran --no-manual
           error-on: '"warning"'
           build_args: '"--no-manual"'
 
