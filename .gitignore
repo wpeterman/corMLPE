@@ -9,6 +9,7 @@ src/*.dll
 src/*.swp
 src/*.bkp
 Rcpp*.tar.gz
+corMLPE_*.tar.gz
 autom4te.cache
 config.*
 .positai
