@@ -57,7 +57,7 @@ jobs:
             --no-manual
             ${{ github.event.inputs.run_revdep_like == 'true' && '--run-donttest' || '' }}
           error-on: '"warning"'
-          build_args: 'c("--no-manual", "--keep-empty-dirs")'
+          build_args: '"--no-manual"'
 
       - name: Test coverage summary
         if: matrix.config.os == 'ubuntu-latest' && matrix.config.r == 'release'
@@ -66,4 +66,3 @@ jobs:
           cov <- covr::package_coverage(type = "tests")
           print(cov)
           cat(sprintf("TOTAL_COVERAGE=%.2f\n", covr::percent_coverage(cov)))
-
