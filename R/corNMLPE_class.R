@@ -1,5 +1,15 @@
 #note some stuff is commented out -- this is working just with the reduced basis, for debugging purposes
 
+#' Correlation Structure for Clustered NMLPE Models
+#'
+#' @param value Numeric vector of length 5 with starting values.
+#' @param nu Smoothness parameter for the Matern covariance kernel.
+#' @param form Formula identifying pair-members and optional grouping.
+#' @param clusters Named list (or vector for one group) of cluster IDs.
+#' @param distances Named list of distance matrices among clusters.
+#' @param fixed Logical; if `TRUE`, keep the correlation parameters fixed.
+#'
+#' @return A `corStruct` object of class `corNMLPE`.
 #' @export
 corNMLPE <- function(#value = c(0.1, 0.1), 
                      value = c(0.1, 0.1, 0.1, 0.1, 0.1), 
@@ -63,26 +73,25 @@ Dim.corNMLPE <- function(object, groups, ...)
 }
 
 #' @export
-getCovariate.corNMLPE <- function(object, data, ...)
+getCovariate.corNMLPE <- function(object, form = formula(object), data)
 {
   #TODO recheck this fuction
 	if(!is.null( aux <- attr(object, "covariate")))
   {
 		return (aux)
-	} 
+  } 
   else 
   {
-		formulator <- formula(object)
-		if (!is.null(getGroupsFormula(formulator))) 
-			groups <- getGroups(object, data = data)
+		if (!is.null(getGroupsFormula(form))) 
+			groups <- getGroups(object, form, data = data)
     else 
 			groups <- as.factor(rep(1, nrow(data)))
     unique_groups <- unique(groups)
 
-		covariateTerms <- attr(terms(getCovariateFormula(formula(object))), "term.labels")
+		covariateTerms <- attr(terms(getCovariateFormula(form)), "term.labels")
     types_var <- sapply(data[,covariateTerms], typeof)
-    if (!(length(covariateTerms) == 2 & all(types_var == "integer" || types_var == "character")))
-			stop("'form' must include two variables that are of factor/integer/character type,
+    if (!(length(covariateTerms) == 2 && all(types_var %in% c("integer", "double", "character"))))
+			stop("'form' must include two variables that are of factor/integer/numeric/character type,
             that are labels for the items being compared in each pairwise observation.")
 
     unprocessed_labels <- cbind(as.character(data[,covariateTerms[1]]),
@@ -90,16 +99,16 @@ getCovariate.corNMLPE <- function(object, data, ...)
     unprocessed_distances <- attr(object, "distances")
     unprocessed_clusters <- attr(object, "clusters")
 
-    if (class(unprocessed_distances) == "matrix")
+    if (is.matrix(unprocessed_distances))
       unprocessed_distances <- list('1' = unprocessed_distances)
 
-    if (class(unprocessed_distances) != "list")
+    if (!is.list(unprocessed_distances))
         stop("Distance matrices for each level of the grouping factor must be supplied as a list")
 
     if(is.null(names(unprocessed_distances)) || !all(names(unprocessed_distances) %in% unique_groups))
       stop("Distance matrices must be supplied in a list with names matching levels of the grouping factor")
 
-    if (class(unprocessed_clusters) != "list")
+    if (!is.list(unprocessed_clusters))
       unprocessed_clusters <- list('1' = unprocessed_clusters)
 
     if(is.null(names(unprocessed_clusters)) || !all(names(unprocessed_clusters) %in% unique_groups))
@@ -146,7 +155,7 @@ getCovariate.corNMLPE <- function(object, data, ...)
       # Distances between clusters in a group
       distances <- as.matrix(unprocessed_distances[[i]])
 
-      if (is.null(rownames(distances)) | is.null(colnames(distances)))
+      if (is.null(rownames(distances)) || is.null(colnames(distances)))
         stop("Missing column or row names in distance matrices supplied to \"corNMLPE\" object")
       if (!all(unique_clusters %in% rownames(distances)) ||
           !all(unique_clusters %in% colnames(distances)) )
@@ -218,8 +227,12 @@ coef.corNMLPE <- function (object, unconstrained = TRUE, ...)
 }
 
 #' @export
-as.matrix.corNMLPE <- function(object, ...){
-	corMatrix(object, full=TRUE)
+#' @rdname corNMLPE
+#' @method as.matrix corNMLPE
+#' @param x A fitted `corNMLPE` correlation structure object.
+#' @param ... Unused.
+as.matrix.corNMLPE <- function(x, ...){
+	corMatrix(x, full=TRUE)
 }
 
 #' @export

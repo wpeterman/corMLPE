@@ -65,20 +65,19 @@ Dim.corMLPE <- function(object, groups, ...){
 }
 
 #' @export
-getCovariate.corMLPE <- function(object, data){
+getCovariate.corMLPE <- function(object, form = formula(object), data){
 	if(!is.null( aux <- attr(object, "covariate")))
   {
 		return (aux)
 	} 
   else 
   {
-		formulator       <- formula(object)
-		if (!is.null(getGroupsFormula(formulator))) 
-			groups <- getGroups(object, data = data)
+		if (!is.null(getGroupsFormula(form))) 
+			groups <- getGroups(object, form, data = data)
     else 
 			groups <- as.factor(rep(1, nrow(data)))
 #    groups         <- getGroups(object)#TODO
-		covariateTerms <- attr(terms(getCovariateFormula(formula(object))), "term.labels")
+		covariateTerms <- attr(terms(getCovariateFormula(form)), "term.labels")
 		if(length(covariateTerms) != 2)
 			stop("'form' must include two factors that indicate the members of the pair for each observation.")
 
@@ -133,9 +132,15 @@ coef.corMLPE <- function (object, unconstrained = TRUE, ...) {
 	return(object)
 }
 
+#' Coerce a `corMLPE` Object to a Correlation Matrix
+#'
+#' @rdname corMLPE
+#' @method as.matrix corMLPE
+#' @param x A fitted `corMLPE` correlation structure object.
+#' @param ... Unused.
 #' @export
-as.matrix.corMLPE <- function(object, ...){
-	corMatrix(object, full=TRUE)
+as.matrix.corMLPE <- function(x, ...){
+	corMatrix(x, full=TRUE)
 }
 
 #' @export
@@ -221,27 +226,42 @@ logDet.corMLPE <- function(object, covariate = getCovariate(object), ...){
 # so as not to f*** up other methods that rely on is.matrix(dgCMatrix) == FALSE
 setClass("dgCMatrix_corMLPE", contains="dgCMatrix")
 
+#' Methods for Internal `dgCMatrix_corMLPE` Objects
+#'
+#' These methods preserve class identity required for `mgcv::gamm()`
+#' compatibility when sparse matrix operations are applied.
+#'
+#' @param x A `dgCMatrix_corMLPE` object.
+#' @param i Row index.
+#' @param j Column index.
+#' @param ... Additional arguments passed to matrix subsetting.
+#' @param drop Logical; passed to `[` methods.
+#'
+#' @name dgCMatrix_corMLPE-methods
+NULL
+
 #' @export
-is.matrix.dgCMatrix_corMLPE <- function(object, ...) TRUE
+is.matrix.dgCMatrix_corMLPE <- function(x) TRUE
 #needed to allow mgcv:::formXtViX to work
 
 #' @export
-is.numeric.dgCMatrix_corMLPE <- function(object, ...) TRUE 
+is.numeric.dgCMatrix_corMLPE <- function(x) TRUE 
 #needed to allow mgcv:::formXtViX to work
 
 #' @export
+#' @rdname dgCMatrix_corMLPE-methods
 setMethod("t", signature(x = "dgCMatrix_corMLPE"),
               function(x) 
-                as(.Call("Csparse_transpose", x, FALSE, PACKAGE="Matrix"), "dgCMatrix_corMLPE")
+                as(t(as(x, "dgCMatrix")), "dgCMatrix_corMLPE")
               ,
               valueClass = "dgCMatrix_corMLPE")
 #needed to retain class during transpose, for mgcv:::extract.lme.cov2 to work
 
 #' @export
+#' @rdname dgCMatrix_corMLPE-methods
 setMethod("[", signature(x = "dgCMatrix_corMLPE", i = "index", j = "missing",
                          drop = "logical"),
           function (x, i,j, ..., drop) {
-            cld <- getClassDef(class(x))
             na <- nargs()
             x <- if(na == 4) as(x, "dgCMatrix")[i, , drop=drop]
               else if(na == 3) as(x, "dgCMatrix")[i, drop=drop]
@@ -252,10 +272,10 @@ setMethod("[", signature(x = "dgCMatrix_corMLPE", i = "index", j = "missing",
 #needed to retain class during row-subset
 
 #' @export
+#' @rdname dgCMatrix_corMLPE-methods
 setMethod("[", signature(x = "dgCMatrix_corMLPE", i = "missing", j = "index",
                          drop = "logical"),
           function (x,i,j, ..., drop) {
-            cld <- getClassDef(class(x))
             x <- as(x, "dgCMatrix")[, j, drop=drop]
             as(x, "dgCMatrix_corMLPE")
           })

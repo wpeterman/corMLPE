@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // factor_cov
 Rcpp::List factor_cov(const arma::umat& labels, const arma::mat& L, const arma::mat& K);
 RcppExport SEXP _corMLPE_factor_cov(SEXP labelsSEXP, SEXP LSEXP, SEXP KSEXP) {

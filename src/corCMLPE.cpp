@@ -1,7 +1,7 @@
 #include <RcppArmadillo.h> 
 
 // [[Rcpp::depends(RcppArmadillo)]]
-// [[Rcpp::plugins(cpp11)]]
+// [[Rcpp::plugins(cpp17)]]
 
 // [[Rcpp::export(.factor_cov_cpp)]]
 Rcpp::List factor_cov (const arma::umat& labels, 

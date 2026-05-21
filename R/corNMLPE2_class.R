@@ -1,5 +1,13 @@
 # this could be made much faster by just precomputing M.
 
+#' Correlation Structure for Reduced-Basis NMLPE Models
+#'
+#' @param value Numeric vector of length 2 with starting values.
+#' @param form Formula identifying pair-members and optional grouping.
+#' @param clusters Named list (or vector for one group) of cluster IDs.
+#' @param fixed Logical; if `TRUE`, keep the correlation parameters fixed.
+#'
+#' @return A `corStruct` object of class `corNMLPE2`.
 #' @export
 corNMLPE2 <- function(value = c(0.1, 0.1), 
                      form = ~1, clusters = FALSE, fixed = FALSE)
@@ -57,33 +65,32 @@ Dim.corNMLPE2 <- function(object, groups, ...)
 }
 
 #' @export
-getCovariate.corNMLPE2 <- function(object, data, ...)
+getCovariate.corNMLPE2 <- function(object, form = formula(object), data)
 {
   #TODO recheck this fuction
 	if(!is.null( aux <- attr(object, "covariate")))
   {
 		return (aux)
-	} 
+  } 
   else 
   {
-		formulator <- formula(object)
-		if (!is.null(getGroupsFormula(formulator))) 
-			groups <- getGroups(object, data = data)
+		if (!is.null(getGroupsFormula(form))) 
+			groups <- getGroups(object, form, data = data)
     else 
 			groups <- as.factor(rep(1, nrow(data)))
     unique_groups <- unique(groups)
 
-		covariateTerms <- attr(terms(getCovariateFormula(formula(object))), "term.labels")
+		covariateTerms <- attr(terms(getCovariateFormula(form)), "term.labels")
     types_var <- sapply(data[,covariateTerms], typeof)
-    if (!(length(covariateTerms) == 2 & all(types_var == "integer" || types_var == "character")))
-			stop("'form' must include two variables that are of factor/integer/character type,
+    if (!(length(covariateTerms) == 2 && all(types_var %in% c("integer", "double", "character"))))
+			stop("'form' must include two variables that are of factor/integer/numeric/character type,
             that are labels for the items being compared in each pairwise observation.")
 
     unprocessed_labels <- cbind(as.character(data[,covariateTerms[1]]),
                                 as.character(data[,covariateTerms[2]]))
     unprocessed_clusters <- attr(object, "clusters")
 
-    if (class(unprocessed_clusters) != "list")
+    if (!is.list(unprocessed_clusters))
       unprocessed_clusters <- list('1' = unprocessed_clusters)
 
     if(is.null(names(unprocessed_clusters)) || !all(names(unprocessed_clusters) %in% unique_groups))
@@ -174,8 +181,12 @@ coef.corNMLPE2 <- function (object, unconstrained = TRUE, ...)
 }
 
 #' @export
-as.matrix.corNMLPE2 <- function(object, ...){
-	corMatrix(object, full=TRUE)
+#' @rdname corNMLPE2
+#' @method as.matrix corNMLPE2
+#' @param x A fitted `corNMLPE2` correlation structure object.
+#' @param ... Unused.
+as.matrix.corNMLPE2 <- function(x, ...){
+	corMatrix(x, full=TRUE)
 }
 
 #' @export

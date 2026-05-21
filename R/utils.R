@@ -9,7 +9,7 @@ simulate_corMLPE_residuals <- function (model, n = 1, seed = NULL)
   if(!is.null(seed))
     set.seed(seed)
 
-  stopifnot(class(model)[1]=="gls" & class(model$modelStruct$corStruct)[1]=="corMLPE")
+  stopifnot(inherits(model, "gls") && inherits(model$modelStruct$corStruct, "corMLPE"))
   stopifnot(n > 0)
 
   covariate <- getCovariate.corMLPE(model$modelStruct$corStruct)
@@ -65,9 +65,9 @@ simulate_IBD_corMLPE <- function (sets = 1,
   sim.dist  <- is.null(distances)
   if (sim.dist)
     distances <- list()
-  else if (class(distances)=="dist" & sets==1)
+  else if (inherits(distances, "dist") && sets == 1)
     distances <- list(distances)
-  else if (class(distances)!="list")
+  else if (!is.list(distances))
     stop("Distance matrices must be supplied as a list, for multiple sets")
 
   for (i in 1:sets)

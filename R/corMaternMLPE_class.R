@@ -7,6 +7,16 @@
 # sppe(1|p1 + p2, distances, 2)
 # phpe(1|p1 + p2, phylo)
 
+#' Correlation Structure for Grouped Matern MLPE Models
+#'
+#' @param value Numeric vector of length 2 with starting values
+#'   `c(stddev, range)`.
+#' @param nu Smoothness parameter for the Matern covariance kernel.
+#' @param form Formula identifying pair-members and optional grouping.
+#' @param distances A named list of distance matrices, one per group.
+#' @param fixed Logical; if `TRUE`, keep the correlation parameters fixed.
+#'
+#' @return A `corStruct` object of class `corMaternMLPE`.
 #' @export
 corMaternMLPE <- function(value = c(0.1, 0.1), nu = 2, form = ~1, distances = FALSE, fixed = FALSE)
 {
@@ -66,7 +76,7 @@ Dim.corMaternMLPE <- function(object, groups, ...)
 }
 
 #' @export
-getCovariate.corMaternMLPE <- function(object, data, ...)
+getCovariate.corMaternMLPE <- function(object, form = formula(object), data)
 {
 	if(!is.null( aux <- attr(object, "covariate")))
   {
@@ -74,27 +84,26 @@ getCovariate.corMaternMLPE <- function(object, data, ...)
 	} 
   else 
   {
-		formulator <- formula(object)
-		if (!is.null(getGroupsFormula(formulator))) 
-			groups <- getGroups(object, data = data)
+		if (!is.null(getGroupsFormula(form))) 
+			groups <- getGroups(object, form, data = data)
     else 
 			groups <- as.factor(rep(1, nrow(data)))
     unique_groups <- unique(groups)
 
-		covariateTerms <- attr(terms(getCovariateFormula(formula(object))), "term.labels")
+		covariateTerms <- attr(terms(getCovariateFormula(form)), "term.labels")
     types_var <- sapply(data[,covariateTerms], typeof)
-    if (!(length(covariateTerms) == 2 & all(types_var == "integer" || types_var == "character")))
-			stop("'form' must include two variables that are of factor/integer/character type,
+    if (!(length(covariateTerms) == 2 && all(types_var %in% c("integer", "double", "character"))))
+			stop("'form' must include two variables that are of factor/integer/numeric/character type,
             that are labels for the items being compared in each pairwise observation.")
 
     unprocessed_labels <- cbind(as.character(data[,covariateTerms[1]]),
                                 as.character(data[,covariateTerms[2]]))
     unprocessed_distances <- attr(object, "distances")
 
-    if (class(unprocessed_distances) == "matrix")
+    if (is.matrix(unprocessed_distances))
       unprocessed_distances <- list('1' = unprocessed_distances)
 
-    if (class(unprocessed_distances) != "list")
+    if (!is.list(unprocessed_distances))
         stop("Distance matrices for each level of the grouping factor must be supplied as a list")
 
     if(is.null(names(unprocessed_distances)) || !all(names(unprocessed_distances) %in% unique_groups))
@@ -121,7 +130,7 @@ getCovariate.corMaternMLPE <- function(object, data, ...)
       # Distances between items in a group
       distances <- as.matrix(unprocessed_distances[[i]])
 
-      if (is.null(rownames(distances)) | is.null(colnames(distances)))
+      if (is.null(rownames(distances)) || is.null(colnames(distances)))
         stop("Missing column or row names in distance matrices supplied to \"corMaternMLPE\" object")
       if (!all(unique_labels %in% rownames(distances)) ||
           !all(unique_labels %in% colnames(distances)) )
@@ -183,8 +192,12 @@ coef.corMaternMLPE <- function (object, unconstrained = TRUE, ...)
 }
 
 #' @export
-as.matrix.corMaternMLPE <- function(object, ...){
-	corMatrix(object, full=TRUE)
+#' @rdname corMaternMLPE
+#' @method as.matrix corMaternMLPE
+#' @param x A fitted `corMaternMLPE` correlation structure object.
+#' @param ... Unused.
+as.matrix.corMaternMLPE <- function(x, ...){
+	corMatrix(x, full=TRUE)
 }
 
 #' @export

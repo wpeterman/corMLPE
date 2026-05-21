@@ -2,9 +2,12 @@
 % Please edit documentation in R/corMLPE_class.R
 \name{corMLPE}
 \alias{corMLPE}
+\alias{as.matrix.corMLPE}
 \title{Correlation structure for symmetric relational data}
 \usage{
 corMLPE(value = 0.1, form = ~1, fixed = FALSE)
+
+\method{as.matrix}{corMLPE}(x, ...)
 }
 \arguments{
 \item{value}{Starting value for the correlation parameter}
@@ -12,9 +15,15 @@ corMLPE(value = 0.1, form = ~1, fixed = FALSE)
 \item{form}{A formula including two variables that give the unordered pair of elements associated with each observation, and optionally a grouping factor that indicates the set to which the elements belong. See 'Details'.}
 
 \item{fixed}{Optional. Logical, fit model with the starting value for the correlation parameter fixed}
+
+\item{x}{A fitted `corMLPE` correlation structure object.}
+
+\item{...}{Unused.}
 }
 \description{
 Correlation structure for symmetric relational data
+
+Coerce a `corMLPE` Object to a Correlation Matrix
 }
 \details{
 "Maximum likelihood population effects" (MLPE) is a correlation structure for dyadic, symmetric relational data: where each observation is a measurement for an unordered pair of elements from a set. For two (different) elements $i,j$, let \eqn{E[y_{i,j}]} be the expectation of the response variable (perhaps conditional on some random effects), and \deqn{y_{i,j} = E[y_{i,j}] + \alpha_{i} + \alpha_{j} + \epsilon_{i,j},} where \eqn{\alpha} are associated with unique elements of the set and are i.i.d zero-mean Gaussian random variables with standard deviation \eqn{\tau}; and \eqn{\epsilon} are i.i.d Gaussian errors with standard deviation \eqn{\sigma}. Marginally (after integrating out \eqn{\alpha}), the covariance between two observations \eqn{y_{i,j}} and \eqn{y_{k,l}} is \deqn{cov(y_{i,j}, y_{k,l}) = \tau^2 (\delta(i,k) + \delta(j,l))} where the function \eqn{\delta} evaluates to 1 when its arguments are equal and zero otherwise, and we order the indices so that \eqn{i < j, k < l} for convenience. 

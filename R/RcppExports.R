@@ -2,46 +2,46 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 .factor_cov_cpp <- function(labels, L, K) {
-    .Call('_corMLPE_factor_cov', PACKAGE = 'corMLPE', labels, L, K)
+    .Call(`_corMLPE_factor_cov`, labels, L, K)
 }
 
 .recalc_cov_cpp <- function(labels, L, M, stddev, input) {
-    .Call('_corMLPE_recalc_cov', PACKAGE = 'corMLPE', labels, L, M, stddev, input)
+    .Call(`_corMLPE_recalc_cov`, labels, L, M, stddev, input)
 }
 
 .getCovariate_cov_cpp <- function(labels, nodes) {
-    .Call('_corMLPE_getCovariate_cov', PACKAGE = 'corMLPE', labels, nodes)
+    .Call(`_corMLPE_getCovariate_cov`, labels, nodes)
 }
 
 .recalc_cpp <- function(labels, nodes, P, D, input, rho) {
-    .Call('_corMLPE_recalc', PACKAGE = 'corMLPE', labels, nodes, P, D, input, rho)
+    .Call(`_corMLPE_recalc`, labels, nodes, P, D, input, rho)
 }
 
 .recalc_inverse_cpp <- function(labels, nodes, P, D, input, rho) {
-    .Call('_corMLPE_recalc_inverse', PACKAGE = 'corMLPE', labels, nodes, P, D, input, rho)
+    .Call(`_corMLPE_recalc_inverse`, labels, nodes, P, D, input, rho)
 }
 
 .getCovariate_cpp <- function(labels, nodes) {
-    .Call('_corMLPE_adjacency', PACKAGE = 'corMLPE', labels, nodes)
+    .Call(`_corMLPE_adjacency`, labels, nodes)
 }
 
 .linear_index_NMLPE_cpp <- function(indices, dim) {
-    .Call('_corMLPE_linear_index', PACKAGE = 'corMLPE', indices, dim)
+    .Call(`_corMLPE_linear_index`, indices, dim)
 }
 
 .adjacency_NMLPE_cpp <- function(label, cluster) {
-    .Call('_corMLPE_adjacency_NMLPE', PACKAGE = 'corMLPE', label, cluster)
+    .Call(`_corMLPE_adjacency_NMLPE`, label, cluster)
 }
 
 .change_basis_NMLPE_cpp <- function(adj_0, adj_1, adj_2, adj_3, E_0, E_1, e_2, e_3, Linv) {
-    .Call('_corMLPE_change_basis_NMLPE', PACKAGE = 'corMLPE', adj_0, adj_1, adj_2, adj_3, E_0, E_1, e_2, e_3, Linv)
+    .Call(`_corMLPE_change_basis_NMLPE`, adj_0, adj_1, adj_2, adj_3, E_0, E_1, e_2, e_3, Linv)
 }
 
 .factor_cov_NMLPE_cpp <- function(labels, comparisons, L, K) {
-    .Call('_corMLPE_factor_cov_NMLPE', PACKAGE = 'corMLPE', labels, comparisons, L, K)
+    .Call(`_corMLPE_factor_cov_NMLPE`, labels, comparisons, L, K)
 }
 
 .recalc_cov_NMLPE_cpp <- function(labels, comparisons, Linv, Minv, stddev, input) {
-    .Call('_corMLPE_recalc_cov_NMLPE', PACKAGE = 'corMLPE', labels, comparisons, Linv, Minv, stddev, input)
+    .Call(`_corMLPE_recalc_cov_NMLPE`, labels, comparisons, Linv, Minv, stddev, input)
 }
 
