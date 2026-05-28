@@ -7,7 +7,9 @@ Authors@R: c(
     )
 Description: Implements correlation structures for symmetric relational data
     (e.g. pairwise distances and dissimilarities) that interface with models
-    using 'nlme'-style correlation structures.
+    using 'nlme'-style correlation structures. The maximum likelihood
+    population effects method is described by Clarke et al. (2002)
+    <doi:10.1198/108571102320>.
 Imports:
     MASS,
     Matrix,

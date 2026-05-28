@@ -3,6 +3,19 @@
 #' @param model fitted model of class 'gls' with corMLPE correlation structure
 #' @param n number of simulations
 #' @param seed random seed
+#' @return A numeric matrix with one row per observation in `model` and one
+#'   column per simulation. Values are simulated residual vectors with the
+#'   fitted `corMLPE` dependence structure and the fitted residual standard
+#'   deviation from the `gls` model.
+#' @examples
+#' dat <- simulate_IBD_corMLPE(sets = 1, elements = 5, seed = 1)
+#' fit <- nlme::gls(
+#'   y ~ x,
+#'   data = dat,
+#'   correlation = corMLPE(form = ~pop1 + pop2)
+#' )
+#' sims <- simulate_corMLPE_residuals(fit, n = 2, seed = 2)
+#' dim(sims)
 #' @export
 simulate_corMLPE_residuals <- function (model, n = 1, seed = NULL)
 {
@@ -31,6 +44,16 @@ simulate_corMLPE_residuals <- function (model, n = 1, seed = NULL)
 #' @param residual_sd standard deviation of (correlated) errors
 #' @param distances optional; list of distance matrices (one for each set), or a single distance matrix if sets==1; if absent, locations are simulated from a 2d uniform distribution
 #' @param seed random seed used to simulate data
+#' @return A data frame with one row per pairwise observation and columns
+#'   `y`, `pop1`, `pop2`, `set`, and `x`. The response `y` is simulated from
+#'   an isolation-by-distance model with MLPE-correlated errors, `pop1` and
+#'   `pop2` identify the paired elements, `set` identifies the group, and `x`
+#'   is the pairwise distance. Model settings and simulated random effects are
+#'   stored as attributes.
+#' @examples
+#' dat <- simulate_IBD_corMLPE(sets = 1, elements = 5, seed = 1)
+#' head(dat)
+#' attr(dat, "correlation")
 #' @export
 simulate_IBD_corMLPE <- function (sets = 1, 
                                   elements = rep(10, sets), 

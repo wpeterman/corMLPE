@@ -13,6 +13,22 @@ simulate_corMLPE_residuals(model, n = 1, seed = NULL)
 
 \item{seed}{random seed}
 }
+\value{
+A numeric matrix with one row per observation in `model` and one
+  column per simulation. Values are simulated residual vectors with the
+  fitted `corMLPE` dependence structure and the fitted residual standard
+  deviation from the `gls` model.
+}
 \description{
 Simulate data from a fitted corMLPE model
+}
+\examples{
+dat <- simulate_IBD_corMLPE(sets = 1, elements = 5, seed = 1)
+fit <- nlme::gls(
+  y ~ x,
+  data = dat,
+  correlation = corMLPE(form = ~pop1 + pop2)
+)
+sims <- simulate_corMLPE_residuals(fit, n = 2, seed = 2)
+dim(sims)
 }

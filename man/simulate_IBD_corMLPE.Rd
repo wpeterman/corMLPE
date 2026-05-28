@@ -35,6 +35,19 @@ simulate_IBD_corMLPE(
 
 \item{seed}{random seed used to simulate data}
 }
+\value{
+A data frame with one row per pairwise observation and columns
+  `y`, `pop1`, `pop2`, `set`, and `x`. The response `y` is simulated from
+  an isolation-by-distance model with MLPE-correlated errors, `pop1` and
+  `pop2` identify the paired elements, `set` identifies the group, and `x`
+  is the pairwise distance. Model settings and simulated random effects are
+  stored as attributes.
+}
 \description{
 Simulate data from an isolation-by-distance model with MLPE correlation structure
+}
+\examples{
+dat <- simulate_IBD_corMLPE(sets = 1, elements = 5, seed = 1)
+head(dat)
+attr(dat, "correlation")
 }

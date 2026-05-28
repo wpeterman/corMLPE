@@ -1,3 +1,11 @@
+## Resubmission
+
+This is a resubmission. In this version I have:
+
+* Added the method reference to `DESCRIPTION` using DOI markup.
+* Added missing `\value` sections to exported documentation.
+* Added small executable examples for exported functions and methods.
+
 ## R CMD check results
 
 0 errors | 0 warnings | 1 note

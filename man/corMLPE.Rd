@@ -20,6 +20,14 @@ corMLPE(value = 0.1, form = ~1, fixed = FALSE)
 
 \item{...}{Unused.}
 }
+\value{
+`corMLPE()` returns an object of class `corMLPE` and `corStruct`
+  for use as a correlation structure in `nlme::gls()` or `nlme::lme()`.
+  The object stores the MLPE correlation parameter and the formula that
+  identifies the two members of each pairwise observation. The
+  `as.matrix()` method returns the implied observation-level correlation
+  matrix for an initialized `corMLPE` object.
+}
 \description{
 Correlation structure for symmetric relational data
 
@@ -37,7 +45,13 @@ For example, if "data.frame(elem1 = c(1,1,2), elem2 = c(2,3,4), grp = c(1,1,2))"
 It is important to note that this correlation structure does not directly incorporate a (dis)similarity metric (which could instead be included as a covariate in the regression model), but instead tries to account for the dependence between pairwise measurements taken between the same objects.
 }
 \examples{
-#placeholder ... TODO
+dat <- simulate_IBD_corMLPE(sets = 1, elements = 5, seed = 1)
+fit <- nlme::gls(
+  y ~ x,
+  data = dat,
+  correlation = corMLPE(form = ~pop1 + pop2)
+)
+coef(fit$modelStruct$corStruct, unconstrained = FALSE)
 }
 \references{
 Clarke et al. 2002. Confidence limits for regression relationships between distance matrices: estimating gene flow with distance. Journal of Agricultural, Biological, and Environmental Statistics 7: 361-372.
